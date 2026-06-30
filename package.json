@@ -1,0 +1,49 @@
+{
+  "name": "photographs-library",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.mjs",
+  "type": "module",
+  "types": "./index.d.mts",
+  "author": {
+    "name": "Jonathan Perry for Sequence Media Limited",
+    "email": "sequencemedia@sequencemedia.net",
+    "url": "https://sequencemedia.net"
+  },
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sequencemedialimited/photographs-library.git"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "npm run lint -- --fix",
+    "prepare": "node husky.mjs",
+    "start": "cross-env NODE_ENV=production node library.mjs",
+    "start:compare": "cross-env NODE_ENV=production node compare.mjs",
+    "start:library": "cross-env NODE_ENV=production node library.mjs",
+    "start:validate": "cross-env NODE_ENV=production node validate.mjs"
+  },
+  "dependencies": {
+    "cross-env": "^10.1.0",
+    "csv-writer": "^1.6.0",
+    "exifreader": "^4.41.0",
+    "yargs-parser": "^22.0.0"
+  },
+  "devDependencies": {
+    "@sequencemedia/eslint-config-standard": "^0.2.107",
+    "@sequencemedia/eslint-config-typescript": "^0.1.182",
+    "@types/node": "^25.9.3",
+    "@types/yargs-parser": "^21.0.3",
+    "eslint": "9.38.0",
+    "globals": "^17.6.0",
+    "husky": "^9.1.7"
+  },
+  "imports": {
+    "#photographs-library": "./src/index.mjs",
+    "#photographs-library/*": "./src/*.mjs",
+    "#photographs-library/utils": "./src/utils/index.mjs",
+    "#photographs-library/utils/*": "./src/utils/*.mjs",
+    "#types": "./types/index.d.mts"
+  }
+}
