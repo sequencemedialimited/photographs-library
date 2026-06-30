@@ -39,21 +39,21 @@ export default async function library (topDir, {
   /**
    *  @type {Set<string>}
    */
-  const filePathsSet = new Set()
+  const filePathSet = new Set()
 
   /**
    *  @type {Map<string, FileDateType | null>}
    */
-  const fileDatesMap = new Map()
+  const fileDateMap = new Map()
 
   for await (const filePath of glob(join(ORIGIN, '**/*.{tiff,tif}'))) {
-    filePathsSet.add(filePath)
+    filePathSet.add(filePath)
 
-    fileDatesMap.set(filePath, await getFileDate(filePath))
+    fileDateMap.set(filePath, await getFileDate(filePath))
   }
 
-  if (filePathsSet.size) {
-    const fileNameGroups = getFileNameGroups(filePathsSet, fileDatesMap, LIMIT)
+  if (filePathSet.size) {
+    const fileNameGroups = getFileNameGroups(filePathSet, fileDateMap, LIMIT)
 
     const TIF = join(topDir, 'TIF')
 

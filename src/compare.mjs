@@ -3,14 +3,12 @@
  */
 
 import {
-  basename,
   join
 } from 'node:path'
 
 import { createWriteStream } from 'node:fs'
 
 import {
-  readFile,
   glob,
   unlink
 } from 'node:fs/promises'
@@ -19,6 +17,7 @@ import { createObjectCsvStringifier } from 'csv-writer'
 
 import {
   getFileDate,
+  getFileHash,
   getFileNameSort,
   getEntriesFileNameSort
 } from './utils/index.mjs'
@@ -28,8 +27,24 @@ const HEADER = [
   { id: 'original', title: 'Original' },
   { id: 'duplicate', title: 'Duplicate' },
   { id: 'originalDate', title: 'Original Date' },
-  { id: 'duplicateDate', title: 'Duplicate Date' }
+  { id: 'duplicateDate', title: 'Duplicate Date' },
+  { id: 'originalHash', title: 'Original Hash' },
+  { id: 'duplicateHash', title: 'Duplicate Hash' }
 ]
+
+/**
+ * @param {FileDateType | null} [date]
+ * @returns {string}
+ */
+function toISO (date) {
+  if (!date) return ''
+  return (
+    date.createDate?.toISOString() ??
+    date.modifyDate?.toISOString() ??
+    date.dateTime?.toISOString() ??
+    date.birthTime?.toISOString() ?? ''
+  )
+}
 
 /**
  *  @param {{
@@ -53,43 +68,53 @@ export default async function compare ({
   /**
    *  @type {Set<string>}
    */
-  const filePathsSet = new Set()
+  const filePathSet = new Set()
 
   /**
    *  @type {Map<string, FileDateType | null>}
    */
-  const fileDatesMap = new Map()
+  const fileDateMap = new Map()
+
+  /**
+   *  @type {Map<string, string>}
+   */
+  const fileHashMap = new Map()
 
   for await (const filePath of glob(join(ORIGIN, '**/*.{tiff,tif}'))) {
-    filePathsSet.add(filePath)
+    filePathSet.add(filePath)
 
-    fileDatesMap.set(filePath, await getFileDate(filePath))
+    const [date, hash] = await Promise.all([
+      getFileDate(filePath),
+      getFileHash(filePath)
+    ])
+
+    fileDateMap.set(filePath, date)
+    fileHashMap.set(filePath, hash)
   }
 
-  if (filePathsSet.size) {
+  if (filePathSet.size) {
     /**
      *  @type {Map<string, Set<string>>}
      */
-    const duplicatesMap = new Map()
+    const duplicateMap = new Map()
 
-    const originalPaths = Array.from(filePathsSet).sort(getFileNameSort(fileDatesMap))
+    const originalPaths = Array.from(filePathSet).sort(getFileNameSort(fileDateMap))
 
     for (const originalPath of originalPaths) {
-      const b = basename(originalPath)
-      const candidatePaths = originalPaths.filter((candidatePath) => originalPath !== candidatePath && b === basename(candidatePath))
+      const alpha = fileHashMap.get(originalPath)
+      const candidatePaths = (
+        originalPaths
+          .filter((candidatePath) => originalPath !== candidatePath)
+          .filter((candidatePath) => {
+            const omega = fileHashMap.get(candidatePath)
+            return alpha === omega
+          })
+      )
 
-      if (candidatePaths.length) {
-        const ALPHA = await readFile(originalPath)
-
-        for (const candidatePath of candidatePaths) {
-          const OMEGA = await readFile(candidatePath)
-
-          if (Buffer.compare(ALPHA, OMEGA) === 0) { // equal
-            const duplicates = duplicatesMap.get(originalPath) ?? new Set()
-            if (!duplicatesMap.has(originalPath)) duplicatesMap.set(originalPath, duplicates)
-            duplicates.add(candidatePath)
-          }
-        }
+      for (const candidatePath of candidatePaths) {
+        const duplicateSet = duplicateMap.get(originalPath) ?? new Set()
+        if (!duplicateMap.has(originalPath)) duplicateMap.set(originalPath, duplicateSet)
+        duplicateSet.add(candidatePath)
       }
     }
 
@@ -107,15 +132,20 @@ export default async function compare ({
       }))
 
       let i = 0
-      for await (const [original, duplicates] of Array.from(duplicatesMap.entries()).sort(getEntriesFileNameSort(fileDatesMap))) {
+      for await (const [original, duplicateSet] of Array.from(duplicateMap.entries()).sort(getEntriesFileNameSort(fileDateMap))) {
         await (new Promise((resolve) => {
-          writeStream.write(csvStringifier.stringifyRecords(Array.from(duplicates).map((duplicate) => {
+          writeStream.write(csvStringifier.stringifyRecords(Array.from(duplicateSet).map((duplicate) => {
+            const originalDate = fileDateMap.get(original)
+            const duplicateDate = fileDateMap.get(duplicate)
+
             return {
               row: ++i,
               original,
               duplicate,
-              originalDate: fileDatesMap.get(original)?.createDate?.toISOString() ?? '',
-              duplicateDate: fileDatesMap.get(duplicate)?.createDate?.toISOString() ?? ''
+              originalDate: toISO(originalDate),
+              duplicateDate: toISO(duplicateDate),
+              originalHash: fileHashMap.get(original) ?? '',
+              duplicateHash: fileHashMap.get(duplicate) ?? ''
             }
           })), resolve)
         }))

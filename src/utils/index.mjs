@@ -17,6 +17,10 @@ import {
 } from 'node:path'
 
 import {
+  createReadStream
+} from 'node:fs'
+
+import {
   constants,
   readFile,
   glob,
@@ -26,6 +30,8 @@ import {
   access,
   rm
 } from 'node:fs/promises'
+
+import crypto from 'node:crypto'
 
 import {
   LIMIT
@@ -46,6 +52,41 @@ const {
 } = process
 
 /**
+ * @param {string} filePath
+ * @returns {Promise<string>}
+ */
+export function getFileHash (filePath) {
+  return (
+    new Promise((resolve, reject) => {
+      const hash = crypto.createHash('sha256')
+      createReadStream(filePath)
+        .on('error', reject)
+        .on('data', (chunk) => hash.update(chunk))
+        .on('end', () => resolve(hash.digest('hex')))
+    })
+  )
+}
+
+/**
+ *  @param {string} dateTime
+ *  @returns {Date | null}
+ */
+function fromDateTime (dateTime) {
+  let DATETIME
+  if (/^(\d{2})\.(\d{2})\.(\d{4})/.test(dateTime)) {
+    DATETIME = new Date(dateTime.replace(/^(\d{2})\.(\d{2})\.(\d{4})/, '$3-$2-$1'))
+  } else {
+    if (/^(\d{4}):(\d{2}):(\d{2})/.test(dateTime)) {
+      DATETIME = new Date(dateTime.replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3'))
+    } else {
+      DATETIME = new Date(dateTime)
+    }
+  }
+
+  return isNaN(Number(DATETIME.valueOf())) ? null : DATETIME
+}
+
+/**
  *  @param {string} filePath
  *  @returns {Promise<FileDateType | null>}
  */
@@ -63,7 +104,7 @@ export async function getFileDate (filePath) {
     } = {},
     ModifyDate: {
       value: modifyDate
-    }
+    } = {}
   } = exif
 
   if (createDate || modifyDate) {
@@ -80,7 +121,7 @@ export async function getFileDate (filePath) {
 
     if (dateTime) {
       return {
-        dateTime: dateTime ? /(\d+)\.(\d+)\.(\d+)/.test(dateTime) ? new Date(dateTime.replace(/(\d+)\.(\d+)\.(\d+)/, '$3-$2-$1')) : new Date(dateTime) : null
+        dateTime: fromDateTime(dateTime)
       }
     } else {
       const {
@@ -99,10 +140,10 @@ export async function getFileDate (filePath) {
 }
 
 /**
- *  @param {Map<string, FileDateType | null>} datesMap
+ *  @param {Map<string, FileDateType | null>} dateMap
  *  @return {([alpha]: [string, unknown], [omega]: [string, unknown]) => number}
  */
-export function getEntriesFileNameSort (datesMap = new Map()) {
+export function getEntriesFileNameSort (dateMap = new Map()) {
   /**
    *  @param {[string, unknown]} alpha
    *  @param {[string, unknown]} omega
@@ -112,16 +153,16 @@ export function getEntriesFileNameSort (datesMap = new Map()) {
     const o = basename(omega)
 
     if (a === o) {
-      const a = datesMap.get(alpha)?.createDate?.valueOf() ?? 0
-      const o = datesMap.get(omega)?.createDate?.valueOf() ?? 0
+      const a = dateMap.get(alpha)?.createDate?.valueOf() ?? 0
+      const o = dateMap.get(omega)?.createDate?.valueOf() ?? 0
 
       if (a === o) {
-        const a = datesMap.get(alpha)?.modifyDate?.valueOf() ?? 0
-        const o = datesMap.get(omega)?.modifyDate?.valueOf() ?? 0
+        const a = dateMap.get(alpha)?.modifyDate?.valueOf() ?? 0
+        const o = dateMap.get(omega)?.modifyDate?.valueOf() ?? 0
 
         if (a === o) {
-          const a = datesMap.get(alpha)?.dateTime?.valueOf() ?? 0
-          const o = datesMap.get(omega)?.dateTime?.valueOf() ?? 0
+          const a = dateMap.get(alpha)?.dateTime?.valueOf() ?? 0
+          const o = dateMap.get(omega)?.dateTime?.valueOf() ?? 0
 
           if (a === o) {
             // Alphabetical - File Path
@@ -216,10 +257,10 @@ export function getLimit (limit = null) {
 }
 
 /**
- *  @param {Map<string, FileDateType | null>} datesMap
+ *  @param {Map<string, FileDateType | null>} dateMap
  *  @return {(alpha: string, omega: string) => number}
  */
-export function getFileNameSort (datesMap = new Map()) {
+export function getFileNameSort (dateMap = new Map()) {
   /**
    *  @param {string} alpha
    *  @param {string} omega
@@ -229,16 +270,16 @@ export function getFileNameSort (datesMap = new Map()) {
     const o = basename(omega)
 
     if (a === o) {
-      const a = datesMap.get(alpha)?.createDate?.valueOf() ?? 0
-      const o = datesMap.get(omega)?.createDate?.valueOf() ?? 0
+      const a = dateMap.get(alpha)?.createDate?.valueOf() ?? 0
+      const o = dateMap.get(omega)?.createDate?.valueOf() ?? 0
 
       if (a === o) {
-        const a = datesMap.get(alpha)?.modifyDate?.valueOf() ?? 0
-        const o = datesMap.get(omega)?.modifyDate?.valueOf() ?? 0
+        const a = dateMap.get(alpha)?.modifyDate?.valueOf() ?? 0
+        const o = dateMap.get(omega)?.modifyDate?.valueOf() ?? 0
 
         if (a === o) {
-          const a = datesMap.get(alpha)?.dateTime?.valueOf() ?? 0
-          const o = datesMap.get(omega)?.dateTime?.valueOf() ?? 0
+          const a = dateMap.get(alpha)?.dateTime?.valueOf() ?? 0
+          const o = dateMap.get(omega)?.dateTime?.valueOf() ?? 0
 
           if (a === o) {
             // Alphabetical - File Path
@@ -313,16 +354,16 @@ export function getFindFileNameGroup (fileName, limit = LIMIT) {
 }
 
 /**
- *  @param {Set<string>} [pathsSet]
- *  @param {Map<string, FileDateType | null>} [datesMap]
+ *  @param {Set<string>} [pathSet]
+ *  @param {Map<string, FileDateType | null>} [dateMap]
  *  @param {number} [limit]
  *  @return {string[][]}
  */
-export function getFileNameGroups (pathsSet = new Set(), datesMap = new Map(), limit = LIMIT) {
+export function getFileNameGroups (pathSet = new Set(), dateMap = new Map(), limit = LIMIT) {
   return (
     Array
-      .from(pathsSet)
-      .sort(getFileNameSort(datesMap))
+      .from(pathSet)
+      .sort(getFileNameSort(dateMap))
       .reduce(getFileNameReduce(limit), [])
   )
 }
