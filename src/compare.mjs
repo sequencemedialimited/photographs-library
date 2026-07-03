@@ -108,6 +108,8 @@ export default async function compare ({
           .filter((candidatePath) => originalHash === fileHashMap.get(candidatePath))
       )
 
+      console.log(candidatePaths)
+
       for (const candidatePath of candidatePaths) {
         const duplicateSet = duplicateMap.get(originalPath) ?? new Set()
         if (!duplicateMap.has(originalPath)) duplicateMap.set(originalPath, duplicateSet)
