@@ -112,11 +112,14 @@ export default async function compare ({
 
       console.log(candidatePaths)
 
+      if (candidatePaths.length) duplicateMap.set(originalPath, new Set(candidatePaths))
+
+        /*
       for (const candidatePath of candidatePaths) {
         const duplicateSet = duplicateMap.get(originalPath) ?? new Set()
         if (!duplicateMap.has(originalPath)) duplicateMap.set(originalPath, duplicateSet)
         duplicateSet.add(candidatePath)
-      }
+      } */
     }
 
     const csvStringifier = createObjectCsvStringifier({
