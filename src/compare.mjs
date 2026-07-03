@@ -101,21 +101,12 @@ export default async function compare ({
     const originalPaths = Array.from(filePathSet).sort(getFileNameSort(fileDateMap))
 
     for (const originalPath of originalPaths) {
-      const alpha = fileHashMap.get(originalPath)
-      const candidatePaths = (
+      const originalHash = fileHashMap.get(originalPath)
+      duplicateMap.set(originalPath, new Set(
         originalPaths
           .filter((candidatePath) => originalPath !== candidatePath)
-          .filter((candidatePath) => {
-            const omega = fileHashMap.get(candidatePath)
-            return alpha === omega
-          })
-      )
-
-      for (const candidatePath of candidatePaths) {
-        const duplicateSet = duplicateMap.get(originalPath) ?? new Set()
-        if (!duplicateMap.has(originalPath)) duplicateMap.set(originalPath, duplicateSet)
-        duplicateSet.add(candidatePath)
-      }
+          .filter((candidatePath) => originalHash === fileHashMap.get(candidatePath))
+      ))
     }
 
     const csvStringifier = createObjectCsvStringifier({
