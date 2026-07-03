@@ -35,12 +35,13 @@ const HEADER = [
 ]
 
 /**
+ *  @param {string} workingDir
  *  @param {{
  *    origin: string,
  *    destination: string
  *  }} params
  */
-export default async function compareByDate ({
+export default async function compareByDate (workingDir, {
   origin: ORIGIN,
   destination: DESTINATION
 }) {
@@ -87,7 +88,12 @@ export default async function compareByDate ({
         for (const candidatePath of candidatePaths) {
           // const OMEGA = await readFile(candidatePath)
 
-          console.log(await compare(originalPath, candidatePath))
+          try {
+            console.log(await compare(originalPath, candidatePath, join(workingDir, originalName)))
+          } catch (e) {
+            console.error(e)
+          }
+
 
           /*
           if (Buffer.compare(ALPHA, OMEGA) === 0) { // equal

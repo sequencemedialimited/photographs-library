@@ -13,7 +13,8 @@ import {
 } from 'node:fs'
 
 import {
-  normalisePath
+  normalisePath,
+  createWorkingDir
 } from '#photographs-library/utils'
 
 import compareByOdiff from '#photographs-library/compare-by-odiff'
@@ -22,6 +23,9 @@ import configMap from '#photographs-library/config'
 
 if (!configMap.has('from')) throw new Error('`from` is required')
 
+/**
+ *  @type {string}
+ */
 const ORIGIN = resolve(normalisePath(configMap.get('from')))
 try {
   // ensure the path exists
@@ -36,34 +40,46 @@ try {
   throw new Error(`Invalid \`from\` @ "${ORIGIN}"`)
 }
 
-const to = resolve(normalisePath(configMap.get('to') || ORIGIN))
-let DESTINATION
+/**
+ *  @type {string}
+ */
+let DESTINATION = resolve(normalisePath(configMap.get('to') || ORIGIN))
 try {
   // parse the path
   const {
     ext,
     dir
-  } = parse(to)
+  } = parse(DESTINATION)
 
   if (ext) {
     // it's a file
     accessSync(dir, constants.R_OK | constants.W_OK)
-    DESTINATION = to
   } else {
     // it's a directory
-    accessSync(to, constants.R_OK | constants.W_OK)
-    DESTINATION = join(to, 'compare-by-odiff.csv')
+    accessSync(DESTINATION, constants.R_OK | constants.W_OK)
+    DESTINATION = join(DESTINATION, 'compare-by-odiff.csv')
   }
 } catch {
-  throw new Error(`Invalid \`to\` @ "${to}"`)
+  throw new Error(`Invalid \`to\` @ "${DESTINATION}"`)
+}
+
+const WORKING_DIR = configMap.get('working-dir')
+
+/**
+ * @param {string} workingDir
+ * @returns {Promise<void>}
+ */
+function execute (workingDir) {
+  return compareByOdiff(workingDir, {
+    origin: ORIGIN,
+    destination: DESTINATION
+  })
 }
 
 console.log('🚀')
 export default (
-  compareByOdiff({
-    origin: ORIGIN,
-    destination: DESTINATION
-  })
+  createWorkingDir(WORKING_DIR)
+    .then(execute)
     .then(() => {
       console.log('👍')
     })
