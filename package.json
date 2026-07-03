@@ -22,12 +22,14 @@
     "start": "cross-env NODE_ENV=production node library.mjs",
     "start:compare-by-file": "cross-env NODE_ENV=production node compare-by-file.mjs",
     "start:compare-by-hash": "cross-env NODE_ENV=production node compare-by-hash.mjs",
+    "start:compare-by-odiff": "cross-env NODE_ENV=production node compare-by-odiff.mjs",
     "start:library": "cross-env NODE_ENV=production node library.mjs"
   },
   "dependencies": {
     "cross-env": "^10.1.0",
     "csv-writer": "^1.6.0",
     "exifreader": "^4.41.0",
+    "odiff-bin": "^4.3.8",
     "yargs-parser": "^22.0.0"
   },
   "devDependencies": {
