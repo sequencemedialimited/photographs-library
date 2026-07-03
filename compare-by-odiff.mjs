@@ -69,8 +69,8 @@ const WORKING_DIR = configMap.get('working-dir')
  * @param {string} workingDir
  * @returns {Promise<void>}
  */
-function execute (workingDir) {
-  return compareByOdiff(workingDir, {
+async function execute (workingDir) {
+  await compareByOdiff(workingDir, {
     origin: ORIGIN,
     destination: DESTINATION
   })
