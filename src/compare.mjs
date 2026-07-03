@@ -101,14 +101,15 @@ export default async function compare ({
     const originalPaths = Array.from(filePathSet).sort(getFileNameSort(fileDateMap))
 
     for (const originalPath of originalPaths) {
-      const originalHash = fileHashMap.get(originalPath)
+      const alpha = fileHashMap.get(originalPath)
       const candidatePaths = (
         originalPaths
           .filter((candidatePath) => originalPath !== candidatePath)
-          .filter((candidatePath) => originalHash === fileHashMap.get(candidatePath))
+          .filter((candidatePath) => {
+            const omega = fileHashMap.get(candidatePath)
+            return alpha === omega
+          })
       )
-
-      console.log(candidatePaths)
 
       for (const candidatePath of candidatePaths) {
         const duplicateSet = duplicateMap.get(originalPath) ?? new Set()
