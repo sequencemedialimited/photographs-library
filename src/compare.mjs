@@ -104,11 +104,17 @@ export default async function compare ({
       console.log(originalPath)
 
       const originalHash = fileHashMap.get(originalPath)
-      duplicateMap.set(originalPath, new Set(
+      const candidatePaths = (
         originalPaths
           .filter((candidatePath) => originalPath !== candidatePath)
           .filter((candidatePath) => originalHash === fileHashMap.get(candidatePath))
-      ))
+      )
+
+      for (const candidatePath of candidatePaths) {
+        const duplicateSet = duplicateMap.get(originalPath) ?? new Set()
+        if (!duplicateMap.has(originalPath)) duplicateMap.set(originalPath, duplicateSet)
+        duplicateSet.add(candidatePath)
+      }
     }
 
     const csvStringifier = createObjectCsvStringifier({
