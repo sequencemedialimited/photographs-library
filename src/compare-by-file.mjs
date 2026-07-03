@@ -3,12 +3,14 @@
  */
 
 import {
+  basename,
   join
 } from 'node:path'
 
 import { createWriteStream } from 'node:fs'
 
 import {
+  readFile,
   glob,
   unlink
 } from 'node:fs/promises'
@@ -17,9 +19,9 @@ import { createObjectCsvStringifier } from 'csv-writer'
 
 import {
   getFileDate,
-  getFileHash,
   getFileNameSort,
-  getEntriesFileNameSort
+  getEntriesFileNameSort,
+  toISO
 } from './utils/index.mjs'
 
 const HEADER = [
@@ -27,24 +29,8 @@ const HEADER = [
   { id: 'original', title: 'Original' },
   { id: 'duplicate', title: 'Duplicate' },
   { id: 'originalDate', title: 'Original Date' },
-  { id: 'duplicateDate', title: 'Duplicate Date' },
-  { id: 'originalHash', title: 'Original Hash' },
-  { id: 'duplicateHash', title: 'Duplicate Hash' }
+  { id: 'duplicateDate', title: 'Duplicate Date' }
 ]
-
-/**
- * @param {FileDateType | null} [date]
- * @returns {string}
- */
-function toISO (date) {
-  if (!date) return ''
-  return (
-    date.createDate?.toISOString() ??
-    date.modifyDate?.toISOString() ??
-    date.dateTime?.toISOString() ??
-    date.birthTime?.toISOString() ?? ''
-  )
-}
 
 /**
  *  @param {{
@@ -52,7 +38,7 @@ function toISO (date) {
  *    destination: string
  *  }} params
  */
-export default async function compare ({
+export default async function compareByDate ({
   origin: ORIGIN,
   destination: DESTINATION
 }) {
@@ -75,21 +61,9 @@ export default async function compare ({
    */
   const fileDateMap = new Map()
 
-  /**
-   *  @type {Map<string, string>}
-   */
-  const fileHashMap = new Map()
-
   for await (const filePath of glob(join(ORIGIN, '**/*.{tiff,tif}'))) {
     filePathSet.add(filePath)
-
-    const [date, hash] = await Promise.all([
-      getFileDate(filePath),
-      getFileHash(filePath)
-    ])
-
-    fileDateMap.set(filePath, date)
-    fileHashMap.set(filePath, hash)
+    fileDateMap.set(filePath, await getFileDate(filePath))
   }
 
   if (filePathSet.size) {
@@ -99,12 +73,26 @@ export default async function compare ({
     const duplicateMap = new Map()
 
     const originalPaths = Array.from(filePathSet).sort(getFileNameSort(fileDateMap))
+
     for (const originalPath of originalPaths) {
-      const originalHash = fileHashMap.get(originalPath)
-      const dulicateSet = new Set(originalPaths
+      const originalName = basename(originalPath)
+      const candidatePaths = originalPaths
         .filter((candidatePath) => originalPath !== candidatePath)
-        .filter((candidatePath) => originalHash === fileHashMap.get(candidatePath)))
-      if (dulicateSet.size) duplicateMap.set(originalPath, dulicateSet)
+        .filter((candidatePath) => originalName === basename(candidatePath))
+
+      if (candidatePaths.length) {
+        const ALPHA = await readFile(originalPath)
+
+        for (const candidatePath of candidatePaths) {
+          const OMEGA = await readFile(candidatePath)
+
+          if (Buffer.compare(ALPHA, OMEGA) === 0) { // equal
+            const duplicateSet = duplicateMap.get(originalPath) ?? new Set()
+            if (!duplicateMap.has(originalPath)) duplicateMap.set(originalPath, duplicateSet)
+            duplicateSet.add(candidatePath)
+          }
+        }
+      }
     }
 
     const csvStringifier = createObjectCsvStringifier({
@@ -132,9 +120,7 @@ export default async function compare ({
               original,
               duplicate,
               originalDate: toISO(originalDate),
-              duplicateDate: toISO(duplicateDate),
-              originalHash: fileHashMap.get(original) ?? '',
-              duplicateHash: fileHashMap.get(duplicate) ?? ''
+              duplicateDate: toISO(duplicateDate)
             }
           })), resolve)
         }))

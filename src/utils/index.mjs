@@ -383,3 +383,17 @@ export function toPsdPath (filePath) {
 export function toJpgPath (filePath) {
   return filePath.replace(/\/PSD\/(.+)\//, '/PSD/$1/JPG/').replace(/\.psd$/, '.jpg')
 }
+
+/**
+ * @param {FileDateType | null} [date]
+ * @returns {string}
+ */
+export function toISO (date) {
+  if (!date) return ''
+  return (
+    date.createDate?.toISOString() ??
+    date.modifyDate?.toISOString() ??
+    date.dateTime?.toISOString() ??
+    date.birthTime?.toISOString() ?? ''
+  )
+}

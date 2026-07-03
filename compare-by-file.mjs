@@ -16,7 +16,7 @@ import {
   normalisePath
 } from '#photographs-library/utils'
 
-import compare from '#photographs-library/compare'
+import compareByFile from '#photographs-library/compare-by-file'
 
 import configMap from '#photographs-library/config'
 
@@ -52,7 +52,7 @@ try {
   } else {
     // it's a directory
     accessSync(to, constants.R_OK | constants.W_OK)
-    DESTINATION = join(to, 'compare.csv')
+    DESTINATION = join(to, 'compare-by-file.csv')
   }
 } catch {
   throw new Error(`Invalid \`to\` @ "${to}"`)
@@ -60,7 +60,7 @@ try {
 
 console.log('🚀')
 export default (
-  compare({
+  compareByFile({
     origin: ORIGIN,
     destination: DESTINATION
   })
