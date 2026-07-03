@@ -36,26 +36,24 @@ try {
   throw new Error(`Invalid \`from\` @ "${ORIGIN}"`)
 }
 
-const to = resolve(normalisePath(configMap.get('to') || ORIGIN))
-let DESTINATION
+let DESTINATION = resolve(normalisePath(configMap.get('to') || ORIGIN))
 try {
   // parse the path
   const {
     ext,
     dir
-  } = parse(to)
+  } = parse(DESTINATION)
 
   if (ext) {
     // it's a file
     accessSync(dir, constants.R_OK | constants.W_OK)
-    DESTINATION = to
   } else {
     // it's a directory
-    accessSync(to, constants.R_OK | constants.W_OK)
-    DESTINATION = join(to, 'compare-by-hash.csv')
+    accessSync(DESTINATION, constants.R_OK | constants.W_OK)
+    DESTINATION = join(DESTINATION, 'compare-by-hash.csv')
   }
 } catch {
-  throw new Error(`Invalid \`to\` @ "${to}"`)
+  throw new Error(`Invalid \`to\` @ "${DESTINATION}"`)
 }
 
 console.log('🚀')
