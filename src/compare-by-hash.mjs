@@ -33,7 +33,6 @@ const HEADER = [
   { id: 'duplicateHash', title: 'Duplicate Hash' }
 ]
 
-
 /**
  *  @param {{
  *    origin: string,

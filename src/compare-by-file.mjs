@@ -73,7 +73,6 @@ export default async function compareByDate ({
     const duplicateMap = new Map()
 
     const originalPaths = Array.from(filePathSet).sort(getFileNameSort(fileDateMap))
-
     for (const originalPath of originalPaths) {
       const originalName = basename(originalPath)
       const candidatePaths = originalPaths
