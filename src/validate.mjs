@@ -26,7 +26,7 @@ import {
 
 const HEADER = [
   { id: 'row', title: 'Row' },
-  { id: 'filePath', title: 'File Path'},
+  { id: 'filePath', title: 'File Path' },
   { id: 'tif', title: 'TIF' },
   { id: 'psd', title: 'PSD' },
   { id: 'jpg', title: 'JPG' },
@@ -77,29 +77,29 @@ export default async function validate ({
     const exceptionsMap = new Map()
 
     for (const filePath of filePathSet) {
-      if (dirname(filePath) !== 'TIF') {
+      if (!dirname(filePath).endsWith('TIF')) {
         const exceptions = exceptionsMap.get(filePath) ?? new Map()
         if (!exceptionsMap.has(filePath)) exceptionsMap.set(filePath, exceptions)
         exceptions.set('tif', filePath)
       } else {
-      const psd = toPsdPath(filePath)
-      const jpg = toJpgPath(toPsdPath(filePath))
+        const psd = toPsdPath(filePath)
+        const jpg = toJpgPath(toPsdPath(filePath))
 
-      try {
-        await accessFile(psd)
-      } catch {
-        const exceptions = exceptionsMap.get(filePath) ?? new Map()
-        if (!exceptionsMap.has(filePath)) exceptionsMap.set(filePath, exceptions)
-        exceptions.set('psd', psd)
-      }
+        try {
+          await accessFile(psd)
+        } catch {
+          const exceptions = exceptionsMap.get(filePath) ?? new Map()
+          if (!exceptionsMap.has(filePath)) exceptionsMap.set(filePath, exceptions)
+          exceptions.set('psd', psd)
+        }
 
-      try {
-        await accessFile(jpg)
-      } catch {
-        const exceptions = exceptionsMap.get(filePath) ?? new Map()
-        if (!exceptionsMap.has(filePath)) exceptionsMap.set(filePath, exceptions)
-        exceptions.set('jpg', jpg)
-      }
+        try {
+          await accessFile(jpg)
+        } catch {
+          const exceptions = exceptionsMap.get(filePath) ?? new Map()
+          if (!exceptionsMap.has(filePath)) exceptionsMap.set(filePath, exceptions)
+          exceptions.set('jpg', jpg)
+        }
       }
     }
 
@@ -127,9 +127,9 @@ export default async function validate ({
             tif: exceptions.get('tif') ?? '',
             psd: exceptions.get('psd') ?? '',
             jpg: exceptions.get('jpg') ?? '',
-            createDate:fileDate?.createDate?.toISOString() ?? '',
-            modifyDate:fileDate?.modifyDate?.toISOString() ?? '',
-            dateTime:fileDate?.dateTime?.toISOString() ?? ''
+            createDate: fileDate?.createDate?.toISOString() ?? '',
+            modifyDate: fileDate?.modifyDate?.toISOString() ?? '',
+            dateTime: fileDate?.dateTime?.toISOString() ?? ''
           }]), resolve)
         }))
       }

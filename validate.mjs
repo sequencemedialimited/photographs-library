@@ -36,7 +36,7 @@ try {
   throw new Error(`Invalid \`from\` @ "${ORIGIN}"`)
 }
 
-let DESTINATION =resolve(normalisePath(configMap.get('to') || ORIGIN))
+let DESTINATION = resolve(normalisePath(configMap.get('to') || ORIGIN))
 try {
   // parse the path
   const {
