@@ -79,7 +79,7 @@ export default async function validate ({
     for (const filePath of filePathSet) {
       console.log(dirname(filePath))
 
-      if (!/\/TIF\//.test(dirname(filePath))) {
+      if (!dirname(filePath).includes('TIF')) {
         const exceptions = exceptionsMap.get(filePath) ?? new Map()
         if (!exceptionsMap.has(filePath)) exceptionsMap.set(filePath, exceptions)
         exceptions.set('tif', filePath)
