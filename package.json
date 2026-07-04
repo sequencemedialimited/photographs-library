@@ -22,7 +22,8 @@
     "start": "cross-env NODE_ENV=production node library.mjs",
     "start:compare-by-file": "cross-env NODE_ENV=production node compare-by-file.mjs",
     "start:compare-by-hash": "cross-env NODE_ENV=production node compare-by-hash.mjs",
-    "start:library": "cross-env NODE_ENV=production node library.mjs"
+    "start:library": "cross-env NODE_ENV=production node library.mjs",
+    "start:validate": "cross-env NODE_ENV=production node validate.mjs"
   },
   "dependencies": {
     "cross-env": "^10.1.0",
