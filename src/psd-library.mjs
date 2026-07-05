@@ -62,8 +62,6 @@ export default async function psdLibrary (topDir, {
   limit: LIMIT,
   destination: DESTINATION
 }) {
-  console.log({ ORIGIN })
-
   /**
    *  @type {Set<string>}
    */
