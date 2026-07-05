@@ -111,7 +111,7 @@ console.log(2, jpgDir)
 
       for (const filePath of fileNameGroup) {
         const psd = join(psdDir, basename(filePath))
-        const jpg = join(psdDir, subDir, 'JPG', basename(filePath).replace(/\.psd$/, '.jpg'))
+        const jpg = join(jpgDir, basename(filePath).replace(/\.psd$/, '.jpg'))
 
 console.log(3, psd)
 console.log(4, jpg)
