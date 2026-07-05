@@ -103,6 +103,10 @@ export default async function psdLibrary (topDir, {
 
       const jpgDir = join(PSD, subDir, 'JPG')
 
+/**
+1 /volume1/Alpha/Storage/Research/Ancestry/.photographs-library/.working-dir/photographs-library-CLbo1r/PSD/1
+2 /volume1/Alpha/Storage/Research/Ancestry/.photographs-library/.working-dir/photographs-library-CLbo1r/PSD/1/JPG
+ */
 console.log(1, psdDir)
 console.log(2, jpgDir)
 
@@ -113,19 +117,23 @@ console.log(2, jpgDir)
         const psd = join(psdDir, basename(filePath))
         const jpg = join(jpgDir, basename(filePath).replace(/\.psd$/, '.jpg'))
 
-console.log(3, psd, filePath)
-console.log(4, jpg, toJpgPath(filePath))
+        /**
+3 /volume1/Alpha/Storage/Research/Ancestry/.photographs-library/.working-dir/photographs-library-CLbo1r/PSD/1/Tom McThune, 30 May 2010.psd /volume1/Alpha/Storage/Research/Ancestry/Library (PSD)/Jonathan Perry/2010/PSD/5/Tom McThune, 30 May 2010.psd
+4 /volume1/Alpha/Storage/Research/Ancestry/.photographs-library/.working-dir/photographs-library-CLbo1r/PSD/1/JPG/Tom McThune, 30 May 2010.jpg /volume1/Alpha/Storage/Research/Ancestry/Library (PSD)/Jonathan Perry/2010/PSD/5/JPG/Tom McThune, 30 May 2010.jpg
+         */
+console.log(3, filePath, psd)
+console.log(4, toJpgPath(filePath), jpg)
 
-/*
         await Promise.all([
           copyFile(filePath, psd, constants.COPYFILE_EXCL),
           copyFile(toJpgPath(filePath), jpg, constants.COPYFILE_EXCL)
-        ]) */
+        ])
       }
     }
 
+    /*
     await rm(DESTINATION, { recursive: true })
     await mkdir(DESTINATION)
-    await cp(topDir, DESTINATION, { recursive: true })
+    await cp(topDir, DESTINATION, { recursive: true }) */
   }
 }
