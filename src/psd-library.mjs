@@ -113,13 +113,14 @@ console.log(2, jpgDir)
         const psd = join(psdDir, basename(filePath))
         const jpg = join(jpgDir, basename(filePath).replace(/\.psd$/, '.jpg'))
 
-console.log(3, psd)
-console.log(4, jpg)
+console.log(3, psd, filePath)
+console.log(4, jpg, toJpgPath(filePath))
 
+/*
         await Promise.all([
           copyFile(filePath, psd, constants.COPYFILE_EXCL),
           copyFile(toJpgPath(filePath), jpg, constants.COPYFILE_EXCL)
-        ])
+        ]) */
       }
     }
 
