@@ -108,7 +108,10 @@ export default async function psdLibrary (topDir, {
 
       for (const filePath of fileNameGroup) {
         const psd = join(psdDir, basename(filePath))
-        const jpg = toJpgPath(psd)
+        const jpg = join(jpgDir, basename(filePath))
+
+console.log(filePath)
+console.log(toJpgPath(psd))
 
         await Promise.all([
           copyFile(filePath, psd, constants.COPYFILE_EXCL),
