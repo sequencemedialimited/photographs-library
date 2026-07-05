@@ -121,8 +121,8 @@ console.log(2, jpgDir)
 3 /volume1/Alpha/Storage/Research/Ancestry/.photographs-library/.working-dir/photographs-library-CLbo1r/PSD/1/Tom McThune, 30 May 2010.psd /volume1/Alpha/Storage/Research/Ancestry/Library (PSD)/Jonathan Perry/2010/PSD/5/Tom McThune, 30 May 2010.psd
 4 /volume1/Alpha/Storage/Research/Ancestry/.photographs-library/.working-dir/photographs-library-CLbo1r/PSD/1/JPG/Tom McThune, 30 May 2010.jpg /volume1/Alpha/Storage/Research/Ancestry/Library (PSD)/Jonathan Perry/2010/PSD/5/JPG/Tom McThune, 30 May 2010.jpg
          */
-console.log(3, filePath, psd)
-console.log(4, toJpgPath(filePath), jpg)
+console.log(3, { src: filePath, dest: psd })
+console.log(4, { src: toJpgPath(filePath), dest: jpg })
 
         await Promise.all([
           copyFile(filePath, psd, constants.COPYFILE_EXCL),
