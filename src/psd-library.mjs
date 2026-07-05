@@ -135,9 +135,8 @@ export default async function psdLibrary (topDir, {
 
     console.log({ DESTINATION })
 
-    /*
     await rm(DESTINATION, { recursive: true })
     await mkdir(DESTINATION)
-    await cp(topDir, DESTINATION, { recursive: true }) */
+    await cp(topDir, DESTINATION, { recursive: true })
   }
 }
