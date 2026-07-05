@@ -14,16 +14,40 @@ import {
   mkdir,
   copyFile,
   rm,
-  cp
+  cp,
+  stat
 } from 'node:fs/promises'
 
 import {
-  getFileDate,
   toJpgPath,
   getFileNameGroups,
   createDir,
   accessFile
 } from './utils/index.mjs'
+
+/**
+ *  @param {string} filePath
+ *  @returns {Promise<FileDateType | null>}
+ */
+export async function getFileDate (filePath) {
+  const {
+    atime,
+    mtime,
+    ctime,
+    birthtime
+  } = await stat(filePath)
+
+  if (birthtime) {
+    return {
+      atime,
+      mtime,
+      ctime,
+      birthTime: birthtime
+    }
+  }
+
+  return null
+}
 
 /**
  *  @param {string} topDir

@@ -5,6 +5,9 @@ declare global {
       modifyDate?: Date | null
       dateTime?: Date | null
       birthTime?: Date | null
+      atime?: Date | null
+      mtime?: Date | null
+      ctime?: Date | null
     }
   }
 }

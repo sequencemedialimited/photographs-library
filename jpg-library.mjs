@@ -16,7 +16,7 @@ import {
   getLimit
 } from '#photographs-library/utils'
 
-import tifLibrary from '#photographs-library/tif-library'
+import jpgLibrary from '#photographs-library/jpg-library'
 
 import configMap from '#photographs-library/config'
 
@@ -45,7 +45,7 @@ const WORKING_DIR = configMap.get('working-dir')
  *  @returns {Promise<void>}
  */
 async function execute (workingDir) {
-  await tifLibrary(workingDir, {
+  await jpgLibrary(workingDir, {
     origin: ORIGIN,
     limit: LIMIT,
     destination: DESTINATION
