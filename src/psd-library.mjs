@@ -111,11 +111,11 @@ export default async function psdLibrary (topDir, {
         const jpg = join(jpgDir, basename(filePath))
 
 console.log(filePath)
-console.log(toJpgPath(psd))
+console.log(toJpgPath(filePath))
 
         await Promise.all([
           copyFile(filePath, psd, constants.COPYFILE_EXCL),
-          copyFile(toJpgPath(psd), jpg, constants.COPYFILE_EXCL)
+          copyFile(toJpgPath(filePath), jpg, constants.COPYFILE_EXCL)
         ])
       }
     }
