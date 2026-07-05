@@ -116,12 +116,10 @@ console.log(2, jpgDir)
 console.log(3, psd)
 console.log(4, jpg)
 
-        /*
         await Promise.all([
           copyFile(filePath, psd, constants.COPYFILE_EXCL),
           copyFile(toJpgPath(filePath), jpg, constants.COPYFILE_EXCL)
         ])
-          */
       }
     }
 
