@@ -1,1 +1,1 @@
-export { default as library } from './library.mjs'
+export { default as library } from './tif-library.mjs'

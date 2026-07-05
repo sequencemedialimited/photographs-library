@@ -1,0 +1,66 @@
+#!/usr/bin/env node
+
+import {
+  resolve
+} from 'node:path'
+
+import {
+  constants,
+  accessSync
+} from 'node:fs'
+
+import {
+  normalisePath,
+  createWorkingDir,
+  removeWorkingDir,
+  getLimit
+} from '#photographs-library/utils'
+
+import tifLibrary from '#photographs-library/tif-library'
+
+import configMap from '#photographs-library/config'
+
+if (!configMap.has('from')) throw new Error('`from` is required')
+
+const ORIGIN = resolve(normalisePath(configMap.get('from')))
+try {
+  accessSync(ORIGIN, constants.R_OK | constants.W_OK)
+} catch {
+  throw new Error(`No \`from\` @ "${ORIGIN}"`)
+}
+
+const DESTINATION = resolve(normalisePath(configMap.get('to') || ORIGIN))
+try {
+  accessSync(DESTINATION, constants.R_OK | constants.W_OK)
+} catch {
+  throw new Error(`No \`to\` @ "${DESTINATION}"`)
+}
+
+const LIMIT = getLimit(configMap.get('limit'))
+
+const WORKING_DIR = configMap.get('working-dir')
+
+/**
+ *  @param {string} workingDir
+ *  @returns {Promise<void>}
+ */
+async function execute (workingDir) {
+  await tifLibrary(workingDir, {
+    origin: ORIGIN,
+    limit: LIMIT,
+    destination: DESTINATION
+  })
+}
+
+console.log('🚀')
+export default (
+  createWorkingDir(WORKING_DIR)
+    .then(execute)
+    .then(() => {
+      console.log('👍')
+    })
+    .catch(({ message }) => {
+      console.error(`💥 ${message}`)
+    })
+    .finally(() => removeWorkingDir(WORKING_DIR))
+)
