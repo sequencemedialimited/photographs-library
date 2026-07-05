@@ -156,24 +156,29 @@ export function getEntriesFileNameSort (dateMap = new Map()) {
       const A = dateMap.get(alpha)
       const O = dateMap.get(omega)
 
-      const a = A?.createDate?.valueOf() ?? 0
-      const o = O?.createDate?.valueOf() ?? 0
-
-      if (a === o) {
-        const a = A?.modifyDate?.valueOf() ?? 0
-        const o = O?.modifyDate?.valueOf() ?? 0
+      if (A && O) {
+        const a = A?.createDate?.valueOf() ?? 0
+        const o = O?.createDate?.valueOf() ?? 0
 
         if (a === o) {
-          const a = A?.dateTime?.valueOf() ?? 0
-          const o = O?.dateTime?.valueOf() ?? 0
+          const a = A?.modifyDate?.valueOf() ?? 0
+          const o = O?.modifyDate?.valueOf() ?? 0
 
           if (a === o) {
-            const a = Math.min(A?.atime?.valueOf() ?? 0, A?.mtime?.valueOf() ?? 0, A?.ctime?.valueOf() ?? 0, A?.birthTime?.valueOf() ?? 0)
-            const o = Math.min(O?.atime?.valueOf() ?? 0, O?.mtime?.valueOf() ?? 0, O?.ctime?.valueOf() ?? 0, O?.birthTime?.valueOf() ?? 0)
+            const a = A?.dateTime?.valueOf() ?? 0
+            const o = O?.dateTime?.valueOf() ?? 0
 
             if (a === o) {
+              const a = Math.min(A?.atime?.valueOf() ?? 0, A?.mtime?.valueOf() ?? 0, A?.ctime?.valueOf() ?? 0, A?.birthTime?.valueOf() ?? 0)
+              const o = Math.min(O?.atime?.valueOf() ?? 0, O?.mtime?.valueOf() ?? 0, O?.ctime?.valueOf() ?? 0, O?.birthTime?.valueOf() ?? 0)
+
+              if (a === o) {
               // Alphabetical - File Path
-              return alpha.localeCompare(omega)
+                return alpha.localeCompare(omega)
+              }
+
+              // Numerical
+              return a - o
             }
 
             // Numerical
@@ -187,9 +192,6 @@ export function getEntriesFileNameSort (dateMap = new Map()) {
         // Numerical
         return a - o
       }
-
-      // Numerical
-      return a - o
     }
 
     // Alphabetical - File Name
@@ -284,24 +286,29 @@ export function getFileNameSort (dateMap = new Map()) {
       const A = dateMap.get(alpha)
       const O = dateMap.get(omega)
 
-      const a = A?.createDate?.valueOf() ?? 0
-      const o = O?.createDate?.valueOf() ?? 0
-
-      if (a === o) {
-        const a = A?.modifyDate?.valueOf() ?? 0
-        const o = O?.modifyDate?.valueOf() ?? 0
+      if (A && O) {
+        const a = A.createDate?.valueOf() ?? 0
+        const o = O.createDate?.valueOf() ?? 0
 
         if (a === o) {
-          const a = A?.dateTime?.valueOf() ?? 0
-          const o = O?.dateTime?.valueOf() ?? 0
+          const a = A.modifyDate?.valueOf() ?? 0
+          const o = O.modifyDate?.valueOf() ?? 0
 
           if (a === o) {
-            const a = Math.min(A?.atime?.valueOf() ?? 0, A?.mtime?.valueOf() ?? 0, A?.ctime?.valueOf() ?? 0, A?.birthTime?.valueOf() ?? 0)
-            const o = Math.min(O?.atime?.valueOf() ?? 0, O?.mtime?.valueOf() ?? 0, O?.ctime?.valueOf() ?? 0, O?.birthTime?.valueOf() ?? 0)
+            const a = A.dateTime?.valueOf() ?? 0
+            const o = O.dateTime?.valueOf() ?? 0
 
             if (a === o) {
+              const a = Math.min(A.atime?.valueOf() ?? 0, A.mtime?.valueOf() ?? 0, A.ctime?.valueOf() ?? 0, A.birthTime?.valueOf() ?? 0)
+              const o = Math.min(O.atime?.valueOf() ?? 0, O.mtime?.valueOf() ?? 0, O.ctime?.valueOf() ?? 0, O.birthTime?.valueOf() ?? 0)
+
+              if (a === o) {
               // Alphabetical - File Path
-              return alpha.localeCompare(omega)
+                return alpha.localeCompare(omega)
+              }
+
+              // Numerical
+              return a - o
             }
 
             // Numerical
@@ -315,9 +322,6 @@ export function getFileNameSort (dateMap = new Map()) {
         // Numerical
         return a - o
       }
-
-      // Numerical
-      return a - o
     }
 
     // Alphabetical - File Name
