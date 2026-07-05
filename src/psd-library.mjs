@@ -103,12 +103,13 @@ export default async function psdLibrary (topDir, {
 
       const jpgDir = join(PSD, subDir, 'JPG')
 
-console.log(1, PSD)
+console.log(1, psdDir)
 console.log(2, jpgDir)
 
       // child
       await createDir(jpgDir)
 
+      /*
       for (const filePath of fileNameGroup) {
         const psd = join(psdDir, basename(filePath))
         const jpg = join(psdDir, subDir, 'JPG', basename(filePath))
@@ -117,7 +118,7 @@ console.log(2, jpgDir)
           copyFile(filePath, psd, constants.COPYFILE_EXCL),
           copyFile(toJpgPath(filePath), jpg, constants.COPYFILE_EXCL)
         ])
-      }
+      } */
     }
 
     await rm(DESTINATION, { recursive: true })
