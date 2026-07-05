@@ -109,16 +109,20 @@ console.log(2, jpgDir)
       // child
       await createDir(jpgDir)
 
-      /*
       for (const filePath of fileNameGroup) {
         const psd = join(psdDir, basename(filePath))
-        const jpg = join(psdDir, subDir, 'JPG', basename(filePath))
+        const jpg = join(psdDir, subDir, 'JPG', basename(filePath).replace(/\.psd$/, '.jpg'))
 
+console.log(3, psd)
+console.log(4, jpg)
+
+        /*
         await Promise.all([
           copyFile(filePath, psd, constants.COPYFILE_EXCL),
           copyFile(toJpgPath(filePath), jpg, constants.COPYFILE_EXCL)
         ])
-      } */
+          */
+      }
     }
 
     await rm(DESTINATION, { recursive: true })
