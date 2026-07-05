@@ -22,8 +22,10 @@
     "start": "cross-env NODE_ENV=production node library.mjs",
     "start:compare-by-file": "cross-env NODE_ENV=production node compare-by-file.mjs",
     "start:compare-by-hash": "cross-env NODE_ENV=production node compare-by-hash.mjs",
-    "start:tif-library": "cross-env NODE_ENV=production node tif-library.mjs",
+    "start:jpg-library": "cross-env NODE_ENV=production node jpg-library.mjs",
     "start:library": "cross-env NODE_ENV=production node library.mjs",
+    "start:psd-library": "cross-env NODE_ENV=production node psd-library.mjs",
+    "start:tif-library": "cross-env NODE_ENV=production node tif-library.mjs",
     "start:validate": "cross-env NODE_ENV=production node validate.mjs"
   },
   "dependencies": {
